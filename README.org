@@ -37,9 +37,8 @@ But first you have to install rust:
 See [[https://rustup.rs/][rustup.rs]] the official Rust installer.
 
 ** Running the example tokenizer
-#+begin_src sh
-echo "this is a house" > test.txt
-cat test.txt | cargo run
+#+begin_src sh :exports both
+echo "this is a house" | cargo run
 #+end_src
 
 #+RESULTS:
