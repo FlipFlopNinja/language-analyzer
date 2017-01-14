@@ -1,40 +1,39 @@
-
-use std::io::BufRead;
 use std::io;
+use std::io::prelude::*;
 
 fn main() {
-    let stdin = io::stdin();
-    // For each line from stdin
-    for line in stdin.lock().lines() {
-        // Check if the line was correctly read
-        if let Ok(line) = line {
-            // Split the line at every whitespace
-            // Then Print the terms
-            // Iterators in rust are lazy. So the count at the end is only to consume the iterator!
-            line.split_whitespace().inspect(|term| println!("{}", term)).count();
+    for result in wsTokenizer(io::stdin()).collect::<Vec<Vec<String>>>() {
+        for string in result {
+            println!("{}", string);
         }
     }
-
 }
 
 // tokenization
 
-// function for returning a vector of whitespace-splitted words for a given string
-fn split_string(buf: &str) -> (Vec<&str>) {
-    return buf.split_whitespace().collect();
+// whiteSpace tokenizer
+
+fn wsTokenizer(stream: std::io::Stdin) -> wsTokenizer {
+    let mut lines: Vec<String> = Vec::new();
+    for line in stream.lock().lines() {
+        if let Ok(line) = line {
+        lines.push(line);
+        }
+    }
+    lines.reverse();
+    wsTokenizer {strings: lines}
 }
 
-// struct for iterator
-struct Tokenizer {
+struct wsTokenizer {
     strings: Vec<String>,
 }
 
 // returns a vector for each string of the given vector
-impl Iterator for Tokenizer {
+impl Iterator for wsTokenizer {
     type Item = Vec<String>;
 
     fn next(&mut self) -> Option<Vec<String>> {
-        if self.strings.len() <= 0 {
+        if self.strings.is_empty() {
             None
         } else {
             // 1. get the last element of the vec "strings" and remove it
@@ -46,7 +45,12 @@ impl Iterator for Tokenizer {
         }
     }
 }
+//impl Iterator for brTokenizer {}
 
+// function for returning a vector of whitespace-splitted words for a given string
+fn split_string(buf: &str) -> (Vec<&str>) {
+    return buf.split_whitespace().collect();
+}
 
 // normalization to lowercase (vec<String> to x strings)
 struct ToLowerCase {
@@ -57,7 +61,7 @@ impl Iterator for ToLowerCase {
     type Item = String;
 
     fn next(&mut self) -> Option<String> {
-        if self.strings.len() <= 0 {
+        if self.strings.is_empty() {
             None
         } else {
             Some(self.strings.pop().unwrap().to_lowercase())
@@ -68,7 +72,6 @@ impl Iterator for ToLowerCase {
 #[cfg(test)]
 mod tests {
     use super::split_string;
-    use super::Tokenizer;
 
 
     #[test]
@@ -88,6 +91,7 @@ mod tests {
         assert_eq!(test, ["Das", "ist", "ein", "Haus"]);
     }
 
+    /*
     #[test]
     fn tokenizer_test() {
         let mut test = vec!["Das ist ein Haus".to_owned(),
@@ -109,7 +113,6 @@ mod tests {
                             "Das ist ein! Boot.".to_owned(),
                             "Das ist ein! Auto.".to_owned()];
         let mut iter = Tokenizer { strings: test };
-        // let result = iter.collect::<Vec<Vec<String>>>();
         assert_eq!(iter.next().unwrap(),
                    vec!["Das".to_owned(), "ist".to_owned(), "ein".to_owned(), "Auto".to_owned(), ]);
         assert_eq!(iter.next().unwrap(),
@@ -117,5 +120,5 @@ mod tests {
         assert_eq!(iter.next().unwrap(),
                    vec!["Das".to_owned(), "ist".to_owned(), "ein".to_owned(), "Haus".to_owned(), ]);
         assert_eq!(iter.next(), None);
-    }
+    }*/
 }
